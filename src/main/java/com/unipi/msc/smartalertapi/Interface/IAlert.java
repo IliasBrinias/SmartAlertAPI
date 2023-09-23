@@ -6,9 +6,11 @@ import org.springframework.http.ResponseEntity;
 public interface IAlert {
     ResponseEntity<?> createAlert(AlertRequest request);
 
-    ResponseEntity<?> notify(int id);
+    ResponseEntity<?> notify(Long id);
 
     ResponseEntity<?> getAlerts();
 
     ResponseEntity<?> getAlert(Long id);
+
+    ResponseEntity<?> getNotifiedAlerts();
 }

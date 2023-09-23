@@ -13,6 +13,7 @@ public class AlertPresenter {
     private double latitude;
     private double longitude;
     private Long timestamp;
+    private Boolean notified;
     private String comments;
     private Long userId;
     private Long riskId;
@@ -26,6 +27,7 @@ public class AlertPresenter {
                 .timestamp(alert.getTimestamp())
                 .image("image/"+alert.getImage().getId())
                 .comments(alert.getComments())
+                .notified(alert.getNotified())
                 .userId(alert.getUser().getId())
                 .riskId(alert.getRisk().getId())
                 .build();

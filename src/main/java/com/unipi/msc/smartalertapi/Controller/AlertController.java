@@ -2,6 +2,7 @@ package com.unipi.msc.smartalertapi.Controller;
 
 import com.unipi.msc.smartalertapi.Interface.IAlert;
 import com.unipi.msc.smartalertapi.Request.AlertRequest;
+import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,10 @@ public class AlertController {
     private ResponseEntity<?> getAlert(@PathVariable Long id){
         return iAlert.getAlert(id);
     }
+    @GetMapping("notified")
+    private ResponseEntity<?> getNotifiedAlerts(){
+        return iAlert.getNotifiedAlerts();
+    }
 
     @PostMapping
     private ResponseEntity<?> createAlert(@ModelAttribute AlertRequest request){
@@ -27,7 +32,7 @@ public class AlertController {
     }
 
     @PostMapping("{id}/notify")
-    private ResponseEntity<?> notify(@PathVariable int id){
+    private ResponseEntity<?> notify(@PathVariable Long id){
         return iAlert.notify(id);
     }
 

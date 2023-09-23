@@ -20,6 +20,7 @@ public class Alert {
     private double longitude;
     private Long timestamp;
     private String comments;
+    private Boolean notified;
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
