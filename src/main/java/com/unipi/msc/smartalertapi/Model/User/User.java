@@ -1,11 +1,15 @@
 package com.unipi.msc.smartalertapi.Model.User;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.unipi.msc.smartalertapi.Model.Alert.Alert;
+import com.unipi.msc.smartalertapi.Model.Risk.Risk;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -29,6 +33,9 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     @NonNull
     private Role role;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonBackReference
+    private List<Alert> alerts = new ArrayList<>();
 
     public User(String username, String password, String name, @NonNull Role role) {
         this.username = username;

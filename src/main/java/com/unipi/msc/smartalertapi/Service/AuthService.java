@@ -6,13 +6,16 @@ import com.unipi.msc.smartalertapi.Request.LoginRequest;
 import com.unipi.msc.smartalertapi.Request.RegisterRequest;
 import com.unipi.msc.smartalertapi.Response.ErrorResponse;
 import com.unipi.msc.smartalertapi.Response.LoginResponse;
+import com.unipi.msc.smartalertapi.Response.TokenResponse;
 import com.unipi.msc.smartalertapi.Response.UserPresenter;
 import com.unipi.msc.smartalertapi.Shared.ErrorMessages;
 import com.unipi.msc.smartalertapi.config.JwtService;
 import lombok.RequiredArgsConstructor;
+import org.json.JSONObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -52,5 +55,12 @@ public class AuthService implements IAuth {
         User user = userRepository.findByUsername(request.getUsername()).orElse(null);
         if (user == null) return  ResponseEntity.notFound().build();
         return ResponseEntity.ok(LoginResponse.getPresenter(user, jwtService.generateToken(user)));
+    }
+
+    @Override
+    public ResponseEntity<?> getToken() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (user == null) return ResponseEntity.badRequest().body(new ErrorResponse(ErrorMessages.USER_NOT_FOUND));
+        return ResponseEntity.ok(new TokenResponse(jwtService.generateToken(user)));
     }
 }
