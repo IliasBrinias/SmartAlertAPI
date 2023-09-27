@@ -33,11 +33,7 @@ public class AlertService implements IAlert {
     private final ImageRepository imageRepository;
     @Override
     public ResponseEntity<?> createAlert(AlertRequest request) {
-
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!(user instanceof Officer)){
-            return ResponseEntity.badRequest().body(new ErrorResponse(ErrorMessages.ACCESS_DENIED));
-        }
 
         if (request.getLatitude() == 0. || request.getLongitude() == 0. || request.getTimestamp() == null || request.getComments().isEmpty()){
             return ResponseEntity.badRequest().body(new ErrorResponse(ErrorMessages.FILL_OBLIGATORY_FIELDS));
@@ -65,6 +61,7 @@ public class AlertService implements IAlert {
                 .risk(risk)
                 .image(Image.builder().build())
                 .image(image)
+                .notified(false)
                 .user(user)
                 .build();
         alert = alertRepository.save(alert);
@@ -74,6 +71,12 @@ public class AlertService implements IAlert {
 
     @Override
     public ResponseEntity<?> notify(Long id) {
+
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!(user instanceof Officer)){
+            return ResponseEntity.badRequest().body(new ErrorResponse(ErrorMessages.ACCESS_DENIED));
+        }
+
         Alert alert = alertRepository.findById(id).orElse(null);
         if (alert == null) return ResponseEntity.badRequest().body(new ErrorResponse(ErrorMessages.ALERT_NOT_FOUND));
 

@@ -4,6 +4,7 @@ import com.unipi.msc.smartalertapi.Interface.IRisk;
 import com.unipi.msc.smartalertapi.Request.RiskRequest;
 import com.unipi.msc.smartalertapi.Response.ErrorResponse;
 import com.unipi.msc.smartalertapi.Shared.ErrorMessages;
+import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

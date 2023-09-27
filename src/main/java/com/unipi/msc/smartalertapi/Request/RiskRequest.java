@@ -11,6 +11,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RiskRequest {
-    private String name;
     private DangerLevel dangerLevel;
+    private String name;
 }

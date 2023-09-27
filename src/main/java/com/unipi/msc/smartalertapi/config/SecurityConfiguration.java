@@ -1,6 +1,7 @@
 package com.unipi.msc.smartalertapi.config;
 
 import com.unipi.msc.smartalertapi.Model.User.Role;
+import com.unipi.msc.smartalertapi.Response.ErrorResponse;
 import com.unipi.msc.smartalertapi.Shared.ErrorMessages;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
@@ -36,22 +37,20 @@ public class SecurityConfiguration {
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .exceptionHandling().authenticationEntryPoint((request, response, authException) -> {
-                    JSONObject jsonObject = new JSONObject();
-                    try {
-                        if (authException.getLocalizedMessage().equals("Bad credentials")){
-                            jsonObject.put("error", ErrorMessages.USER_NOT_FOUND);
-                        }else {
-                            jsonObject.put("timestamp", new Date());
-                            jsonObject.put("status", 403);
-                            jsonObject.put("message", ErrorMessages.ACCESS_DENIED);
-                        }
-                        response.setContentType("application/json;charset=UTF-8");
-                        response.setStatus(403);
-                        response.getWriter().write(jsonObject.toString());
-                    }catch (Exception ignore){}
-                })
-                .and()
+//                .exceptionHandling().authenticationEntryPoint((request, response, authException) -> {
+//                    response.setContentType("application/json;charset=UTF-8");
+//                    JSONObject jsonObject = new JSONObject();
+//                    try {
+//                        if (authException.getLocalizedMessage().equals("Bad credentials")){
+//                            jsonObject.put("message", ErrorMessages.ACCESS_DENIED);
+//                            response.setStatus(403);
+//                            response.getWriter().write(jsonObject.toString());
+//                        }else{
+//                            response.setStatus(500);
+//                        }
+//                    }catch (Exception ignore){}
+//                })
+//                .and()
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 

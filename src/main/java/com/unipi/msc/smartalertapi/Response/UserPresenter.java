@@ -10,6 +10,7 @@ import lombok.Setter;
 @Setter
 @Builder
 public class UserPresenter {
+    private Long id;
     private String username;
     private String name;
     private Role role;
