@@ -16,7 +16,7 @@ public class AlertPresenter {
     private Boolean notified;
     private String comments;
     private Long userId;
-    private Long riskId;
+    private RiskPresenter risk;
     private String image;
 
     public static AlertPresenter getPresenter(Alert alert){
@@ -29,7 +29,7 @@ public class AlertPresenter {
                 .comments(alert.getComments())
                 .notified(alert.getNotified())
                 .userId(alert.getUser().getId())
-                .riskId(alert.getRisk().getId())
+                .risk(RiskPresenter.getPresenter(alert.getRisk()))
                 .build();
     }
 }
