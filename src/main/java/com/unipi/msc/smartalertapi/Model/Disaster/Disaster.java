@@ -1,8 +1,7 @@
-package com.unipi.msc.smartalertapi.Model.Risk;
+package com.unipi.msc.smartalertapi.Model.Disaster;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.unipi.msc.smartalertapi.Model.Alert.Alert;
-import com.unipi.msc.smartalertapi.Model.DangerLevel;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,13 +14,12 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Risk {
+public class Disaster {
     @Id
     @GeneratedValue
     private Long id;
     private String name;
-    private DangerLevel dangerLevel;
-    @OneToMany(mappedBy = "risk", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "disaster", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonBackReference
     private List<Alert> alerts = new ArrayList<>();
 }

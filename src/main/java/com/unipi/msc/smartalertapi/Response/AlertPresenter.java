@@ -15,8 +15,9 @@ public class AlertPresenter {
     private Long timestamp;
     private Boolean notified;
     private String comments;
-    private Long userId;
-    private RiskPresenter risk;
+    private String username;
+    private String dangerLevel;
+    private DisasterPresenter disaster;
     private String image;
 
     public static AlertPresenter getPresenter(Alert alert){
@@ -28,8 +29,9 @@ public class AlertPresenter {
                 .image("image/"+alert.getImage().getId())
                 .comments(alert.getComments())
                 .notified(alert.getNotified())
-                .userId(alert.getUser().getId())
-                .risk(RiskPresenter.getPresenter(alert.getRisk()))
+                .username(alert.getUser().getName())
+                .disaster(DisasterPresenter.getPresenter(alert.getDisaster()))
+                .dangerLevel(alert.getDangerLevel().name())
                 .build();
     }
 }

@@ -5,13 +5,13 @@ import com.unipi.msc.smartalertapi.Model.Alert.Alert;
 import com.unipi.msc.smartalertapi.Model.Alert.AlertRepository;
 import com.unipi.msc.smartalertapi.Model.Image.Image;
 import com.unipi.msc.smartalertapi.Model.Image.ImageRepository;
-import com.unipi.msc.smartalertapi.Model.Risk.Risk;
-import com.unipi.msc.smartalertapi.Model.Risk.RiskRepository;
+import com.unipi.msc.smartalertapi.Model.Disaster.Disaster;
+import com.unipi.msc.smartalertapi.Model.Disaster.DisasterRepository;
 import com.unipi.msc.smartalertapi.Model.User.Officer;
 import com.unipi.msc.smartalertapi.Model.User.User;
 import com.unipi.msc.smartalertapi.Request.AlertRequest;
 import com.unipi.msc.smartalertapi.Response.AlertPresenter;
-import com.unipi.msc.smartalertapi.Response.ErrorResponse;
+import com.unipi.msc.smartalertapi.Response.GenericResponse;
 import com.unipi.msc.smartalertapi.Shared.ErrorMessages;
 import com.unipi.msc.smartalertapi.Shared.ImageUtils;
 import com.unipi.msc.smartalertapi.Shared.Tools;
@@ -21,25 +21,24 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 public class AlertService implements IAlert {
     private final AlertRepository alertRepository;
-    private final RiskRepository riskRepository;
+    private final DisasterRepository disasterRepository;
     private final ImageRepository imageRepository;
     @Override
     public ResponseEntity<?> createAlert(AlertRequest request) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        if (request.getLatitude() == 0. || request.getLongitude() == 0. || request.getTimestamp() == null || request.getComments().isEmpty()){
-            return ResponseEntity.badRequest().body(new ErrorResponse(ErrorMessages.FILL_OBLIGATORY_FIELDS));
+        if (request.getLatitude() == 0. || request.getLongitude() == 0. ||
+            request.getTimestamp() == null || request.getComments().isEmpty() || request.getDangerLevel() == null ){
+            return GenericResponse.builder().message(ErrorMessages.FILL_OBLIGATORY_FIELDS).build().badRequest();
         }
-        Risk risk = riskRepository.findById(request.getRiskId()).orElse(null);
-        if (risk == null) return ResponseEntity.badRequest().body(new ErrorResponse(ErrorMessages.RISK_NOT_FOUND));
+        Disaster disaster = disasterRepository.findById(request.getDisasterId()).orElse(null);
+        if (disaster == null) return GenericResponse.builder().message(ErrorMessages.RISK_NOT_FOUND).build().badRequest();
 
         Image image = null;
         if (request.getImage() != null){
@@ -58,15 +57,18 @@ public class AlertService implements IAlert {
                 .longitude(request.getLongitude())
                 .timestamp(request.getTimestamp())
                 .comments(request.getComments())
-                .risk(risk)
+                .disaster(disaster)
                 .image(Image.builder().build())
                 .image(image)
                 .notified(false)
+                .dangerLevel(request.getDangerLevel())
                 .user(user)
                 .build();
         alert = alertRepository.save(alert);
 
-        return ResponseEntity.ok(AlertPresenter.getPresenter(alert));
+        if (alert.getNotified()) sendNotification(alert);
+
+        return ResponseEntity.ok(GenericResponse.builder().data(alert).build().success());
     }
 
     @Override
@@ -74,16 +76,16 @@ public class AlertService implements IAlert {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!(user instanceof Officer)){
-            return ResponseEntity.badRequest().body(new ErrorResponse(ErrorMessages.ACCESS_DENIED));
+            return GenericResponse.builder().message(ErrorMessages.ACCESS_DENIED).build().badRequest();
         }
 
         Alert alert = alertRepository.findById(id).orElse(null);
-        if (alert == null) return ResponseEntity.badRequest().body(new ErrorResponse(ErrorMessages.ALERT_NOT_FOUND));
+        if (alert == null) return GenericResponse.builder().message(ErrorMessages.ALERT_NOT_FOUND).build().badRequest();
 
         alert.setNotified(true);
         alert = alertRepository.save(alert);
 
-        return ResponseEntity.ok(AlertPresenter.getPresenter(alert));
+        return GenericResponse.builder().data(alert).build().success();
     }
 
     @Override
@@ -92,14 +94,14 @@ public class AlertService implements IAlert {
         for (Alert alert: alertRepository.findAll()) {
             presenter.add(AlertPresenter.getPresenter(alert));
         }
-        return ResponseEntity.ok(presenter);
+        return GenericResponse.builder().data(presenter).build().success();
     }
 
     @Override
     public ResponseEntity<?> getAlert(Long id) {
         Alert alert = alertRepository.findById(id).orElse(null);
-        if (alert == null) return ResponseEntity.badRequest().body(new ErrorResponse(ErrorMessages.ALERT_NOT_FOUND));
-        return ResponseEntity.ok(alert);
+        if (alert == null) return GenericResponse.builder().message(ErrorMessages.ALERT_NOT_FOUND).build().badRequest();
+        return GenericResponse.builder().data(AlertPresenter.getPresenter(alert)).build().success();
     }
 
     @Override
@@ -111,6 +113,11 @@ public class AlertService implements IAlert {
             alertPresenters.add(AlertPresenter.getPresenter(alert));
         }
 
-        return ResponseEntity.ok(alertPresenters);
+        return GenericResponse.builder().data(alertPresenters).build().success();
     }
+
+    private void sendNotification(Alert alert){
+
+    }
+
 }

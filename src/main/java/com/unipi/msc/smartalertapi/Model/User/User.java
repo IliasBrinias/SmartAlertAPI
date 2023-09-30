@@ -2,7 +2,6 @@ package com.unipi.msc.smartalertapi.Model.User;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.unipi.msc.smartalertapi.Model.Alert.Alert;
-import com.unipi.msc.smartalertapi.Model.Risk.Risk;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;

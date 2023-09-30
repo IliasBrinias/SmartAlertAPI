@@ -1,7 +1,8 @@
 package com.unipi.msc.smartalertapi.Model.Alert;
 
+import com.unipi.msc.smartalertapi.Model.DangerLevel;
 import com.unipi.msc.smartalertapi.Model.Image.Image;
-import com.unipi.msc.smartalertapi.Model.Risk.Risk;
+import com.unipi.msc.smartalertapi.Model.Disaster.Disaster;
 import com.unipi.msc.smartalertapi.Model.User.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -19,14 +20,15 @@ public class Alert {
     private double latitude;
     private double longitude;
     private Long timestamp;
+    private DangerLevel dangerLevel;
     private String comments;
     private Boolean notified;
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
     @ManyToOne
-    @JoinColumn(name = "risk_id")
-    private Risk risk;
+    @JoinColumn(name = "disaster_id")
+    private Disaster disaster;
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "image_id")
     private Image image;

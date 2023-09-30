@@ -1,5 +1,6 @@
 package com.unipi.msc.smartalertapi.Request;
 
+import com.unipi.msc.smartalertapi.Model.DangerLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,7 @@ public class AlertRequest {
     private double longitude;
     private Long timestamp;
     private String comments;
-    private Long riskId;
+    private Long disasterId;
+    private DangerLevel dangerLevel;
     private MultipartFile image;
 }
