@@ -7,42 +7,22 @@ import com.google.firebase.messaging.Notification;
 import com.google.gson.GsonBuilder;
 import com.unipi.msc.smartalertapi.Interface.IMessage;
 import com.unipi.msc.smartalertapi.Model.Alert.Alert;
-import com.unipi.msc.smartalertapi.Model.DangerLevel;
-import com.unipi.msc.smartalertapi.Model.User.User;
 import com.unipi.msc.smartalertapi.Response.AlertPresenter;
-import org.json.JSONObject;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
+import com.unipi.msc.smartalertapi.Shared.Tags;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
-
-import java.util.Arrays;
 
 @Component
 public class FcmService implements IMessage {
-    private final RestTemplate restTemplate;
-    private final static String postUrl = "https://fcm.googleapis.com/fcm/send";
-    private final static String fcmServerKey ="UzFjI7ciWJJvZG7Hhsmx0nSiU5NDaI8W1JWeOoEJEpo";
-
-    public FcmService() {
-        this.restTemplate = new RestTemplate();
-    }
-
     @Override
     public void sendNotification(Alert alert){
 
         try {
             // Create a message with a custom topic
             Message message = Message.builder()
-                    .setNotification(Notification.builder()
-                            .setTitle("Danger")
-                            .setBody(new GsonBuilder().setPrettyPrinting().create().toJson(AlertPresenter.getPresenter(alert)))
-                            .setImage(null)
-                            .build())
                     .setTopic("DANGER_TOPIC")
                     .putData("alertId",String.valueOf(alert.getId()))
+                    .putData("latitude",String.valueOf(alert.getLatitude()))
+                    .putData("longitude",String.valueOf(alert.getLongitude()))
                     .putData("disaster",String.valueOf(alert.getDisaster().getName()))
                     .putData("help",getInfo(alert.getDisaster().getName()))
                     .build();
@@ -54,6 +34,12 @@ public class FcmService implements IMessage {
         }
     }
     private String getInfo(String disasterName){
-        return "";
+        return switch (disasterName) {
+            case "Flood" -> Tags.HIGHER_PLACE;
+            case "Rain" -> Tags.STAY_HOME;
+            case "Τornado" -> Tags.SHELTER;
+            case "Εarthquake" -> Tags.UNDER_TABLE;
+            default -> "";
+        };
     }
 }

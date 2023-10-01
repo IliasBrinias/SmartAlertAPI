@@ -15,6 +15,7 @@ import com.unipi.msc.smartalertapi.Response.AlertPresenter;
 import com.unipi.msc.smartalertapi.Response.GenericResponse;
 import com.unipi.msc.smartalertapi.Shared.ErrorMessages;
 import com.unipi.msc.smartalertapi.Shared.ImageUtils;
+import com.unipi.msc.smartalertapi.Shared.Tags;
 import com.unipi.msc.smartalertapi.Shared.Tools;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
@@ -39,8 +40,9 @@ public class AlertService implements IAlert {
     public ResponseEntity<?> createAlert(AlertRequest request) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        if (request.getLatitude() == 0. || request.getLongitude() == 0. ||
-            request.getTimestamp() == null || request.getComments().isEmpty() || request.getDangerLevel() == null ){
+        if (request.getLatitude() == 0.      || request.getLongitude() == 0. ||
+            request.getTimestamp() == null   || request.getComments().isEmpty() ||
+            request.getDangerLevel() == null || request.getDisasterId() == null){
             return GenericResponse.builder().message(ErrorMessages.FILL_OBLIGATORY_FIELDS).build().badRequest();
         }
         Disaster disaster = disasterRepository.findById(request.getDisasterId()).orElse(null);
@@ -64,7 +66,6 @@ public class AlertService implements IAlert {
                 .timestamp(request.getTimestamp())
                 .comments(request.getComments())
                 .disaster(disaster)
-                .image(Image.builder().build())
                 .image(image)
                 .notified(false)
                 .dangerLevel(request.getDangerLevel())
@@ -72,9 +73,37 @@ public class AlertService implements IAlert {
                 .build();
         alert = alertRepository.save(alert);
 
-        if (alert.getNotified()) iMessage.sendNotification(alert);
+        if (checkAutoNotify(alert)) {
+            alert.setNotified(true);
+            alert = alertRepository.save(alert);
+            iMessage.sendNotification(alert);
+        }
 
         return ResponseEntity.ok(GenericResponse.builder().data(alert).build().success());
+    }
+
+    private boolean checkAutoNotify(Alert alert) {
+        Long timestamp = Tools.getHoursBefore(Tags.HOURS_BEFORE);
+        List<Alert> lastAlerts = alertRepository.findAllByTimestampGreaterThanOrderByTimestampDesc(timestamp);
+        double closeAlerts = 0;
+        double sameAlert = 0;
+        for (Alert a:lastAlerts) {
+            double distance = Tools.distance(a.getLatitude(),alert.getLatitude(),a.getLongitude(),alert.getLongitude());
+            if (distance <= Tags.DISTANCE_LIMIT){
+                closeAlerts += 1;
+                if (a.getDisaster() == alert.getDisaster()) {
+                    switch (alert.getDangerLevel()){
+                        case LOW -> sameAlert += 0.5;
+                        case MEDIUM -> sameAlert += 1;
+                        case HIGH -> sameAlert += 2;
+                    }
+                }
+            }
+        }
+        if (closeAlerts <= Tags.MIN_SIMILAR_EVENTS) return false;
+
+        double percentageOfSameAlerts = sameAlert / closeAlerts * 100.0;
+        return percentageOfSameAlerts >= Tags.MIN_PERCENTAGE_SIMILAR_ALERTS;
     }
 
     @Override

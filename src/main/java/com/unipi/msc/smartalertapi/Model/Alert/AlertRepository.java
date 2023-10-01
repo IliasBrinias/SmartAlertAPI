@@ -8,4 +8,5 @@ import java.util.List;
 @Repository
 public interface AlertRepository extends JpaRepository<Alert,Long> {
     List<Alert> findAllByNotifiedTrueAndTimestampGreaterThanOrderByTimestampDesc(Long timestamp);
+    List<Alert> findAllByTimestampGreaterThanOrderByTimestampDesc(Long timestamp);
 }
