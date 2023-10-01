@@ -21,12 +21,17 @@ public class AlertPresenter {
     private String image;
 
     public static AlertPresenter getPresenter(Alert alert){
+        String imagePath = null;
+        try {
+            imagePath = "image/"+alert.getImage().getId();
+        } catch (Exception ignore){}
+
         return AlertPresenter.builder()
                 .Id(alert.getId())
                 .latitude(alert.getLatitude())
                 .longitude(alert.getLongitude())
                 .timestamp(alert.getTimestamp())
-                .image("image/"+alert.getImage().getId())
+                .image(imagePath)
                 .comments(alert.getComments())
                 .notified(alert.getNotified())
                 .username(alert.getUser().getName())

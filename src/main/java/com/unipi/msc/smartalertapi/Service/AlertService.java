@@ -1,6 +1,7 @@
 package com.unipi.msc.smartalertapi.Service;
 
 import com.unipi.msc.smartalertapi.Interface.IAlert;
+import com.unipi.msc.smartalertapi.Interface.IMessage;
 import com.unipi.msc.smartalertapi.Model.Alert.Alert;
 import com.unipi.msc.smartalertapi.Model.Alert.AlertRepository;
 import com.unipi.msc.smartalertapi.Model.Image.Image;
@@ -16,11 +17,14 @@ import com.unipi.msc.smartalertapi.Shared.ErrorMessages;
 import com.unipi.msc.smartalertapi.Shared.ImageUtils;
 import com.unipi.msc.smartalertapi.Shared.Tools;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import org.json.JSONObject;
+import org.springframework.http.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Component
@@ -29,6 +33,8 @@ public class AlertService implements IAlert {
     private final AlertRepository alertRepository;
     private final DisasterRepository disasterRepository;
     private final ImageRepository imageRepository;
+    private final IMessage iMessage;
+
     @Override
     public ResponseEntity<?> createAlert(AlertRequest request) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -66,7 +72,7 @@ public class AlertService implements IAlert {
                 .build();
         alert = alertRepository.save(alert);
 
-        if (alert.getNotified()) sendNotification(alert);
+        if (alert.getNotified()) iMessage.sendNotification(alert);
 
         return ResponseEntity.ok(GenericResponse.builder().data(alert).build().success());
     }
@@ -84,7 +90,7 @@ public class AlertService implements IAlert {
 
         alert.setNotified(true);
         alert = alertRepository.save(alert);
-
+        iMessage.sendNotification(alert);
         return GenericResponse.builder().data(alert).build().success();
     }
 
@@ -115,9 +121,4 @@ public class AlertService implements IAlert {
 
         return GenericResponse.builder().data(alertPresenters).build().success();
     }
-
-    private void sendNotification(Alert alert){
-
-    }
-
 }
