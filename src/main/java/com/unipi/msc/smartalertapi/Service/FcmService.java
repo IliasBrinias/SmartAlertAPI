@@ -9,6 +9,7 @@ import com.unipi.msc.smartalertapi.Interface.IMessage;
 import com.unipi.msc.smartalertapi.Model.Alert.Alert;
 import com.unipi.msc.smartalertapi.Response.AlertPresenter;
 import com.unipi.msc.smartalertapi.Shared.Tags;
+import com.unipi.msc.smartalertapi.Shared.Tools;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -19,12 +20,12 @@ public class FcmService implements IMessage {
         try {
             // Create a message with a custom topic
             Message message = Message.builder()
-                    .setTopic("DANGER_TOPIC")
+                    .setTopic(Tags.FIREBASE_CHANNEL)
                     .putData("alertId",String.valueOf(alert.getId()))
                     .putData("latitude",String.valueOf(alert.getLatitude()))
                     .putData("longitude",String.valueOf(alert.getLongitude()))
                     .putData("disaster",String.valueOf(alert.getDisaster().getName()))
-                    .putData("help",getInfo(alert.getDisaster().getName()))
+                    .putData("help", Tools.getInfo(alert.getDisaster().getName()))
                     .build();
 
             // Send the message
@@ -33,13 +34,5 @@ public class FcmService implements IMessage {
             throw new RuntimeException(e);
         }
     }
-    private String getInfo(String disasterName){
-        return switch (disasterName) {
-            case "Flood" -> Tags.HIGHER_PLACE;
-            case "Rain" -> Tags.STAY_HOME;
-            case "Τornado" -> Tags.SHELTER;
-            case "Εarthquake" -> Tags.UNDER_TABLE;
-            default -> "";
-        };
-    }
+
 }

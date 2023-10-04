@@ -84,6 +84,10 @@ public class AlertService implements IAlert {
 
     private boolean checkAutoNotify(Alert alert) {
         Long timestamp = Tools.getHoursBefore(Tags.HOURS_BEFORE);
+        if (alertRepository.existsByTimestampGreaterThanAndNotifiedTrueAndDisasterEquals(timestamp,alert.getDisaster())){
+            return false;
+        }
+
         List<Alert> lastAlerts = alertRepository.findAllByTimestampGreaterThanOrderByTimestampDesc(timestamp);
         double closeAlerts = 0;
         double sameAlert = 0;

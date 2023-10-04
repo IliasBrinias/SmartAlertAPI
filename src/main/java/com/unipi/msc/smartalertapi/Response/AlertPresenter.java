@@ -1,6 +1,7 @@
 package com.unipi.msc.smartalertapi.Response;
 
 import com.unipi.msc.smartalertapi.Model.Alert.Alert;
+import com.unipi.msc.smartalertapi.Shared.Tools;
 import lombok.*;
 
 @Getter
@@ -17,6 +18,7 @@ public class AlertPresenter {
     private String comments;
     private String username;
     private String dangerLevel;
+    private String helpInfo;
     private DisasterPresenter disaster;
     private String image;
 
@@ -37,6 +39,7 @@ public class AlertPresenter {
                 .username(alert.getUser().getName())
                 .disaster(DisasterPresenter.getPresenter(alert.getDisaster()))
                 .dangerLevel(alert.getDangerLevel().name())
+                .helpInfo(Tools.getInfo(alert.getDisaster().getName()))
                 .build();
     }
 }

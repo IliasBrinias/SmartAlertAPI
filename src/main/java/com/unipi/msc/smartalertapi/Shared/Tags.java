@@ -9,4 +9,5 @@ public class Tags {
     public static final int DISTANCE_LIMIT = 1000;
     public static final int MIN_SIMILAR_EVENTS = 2;
     public static final int MIN_PERCENTAGE_SIMILAR_ALERTS = 50;
+    public static final String FIREBASE_CHANNEL = "DANGER_TOPIC";
 }

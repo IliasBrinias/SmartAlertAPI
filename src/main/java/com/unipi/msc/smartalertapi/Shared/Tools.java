@@ -27,4 +27,13 @@ public class Tools {
 
         return Math.sqrt(distance);
     }
+    public static String getInfo(String disasterName){
+        return switch (disasterName) {
+            case "Flood" -> Tags.HIGHER_PLACE;
+            case "Rain" -> Tags.STAY_HOME;
+            case "Τornado" -> Tags.SHELTER;
+            case "Εarthquake" -> Tags.UNDER_TABLE;
+            default -> "";
+        };
+    }
 }
