@@ -11,4 +11,6 @@ public interface AlertRepository extends JpaRepository<Alert,Long> {
     List<Alert> findAllByNotifiedTrueAndTimestampGreaterThanOrderByTimestampDesc(Long timestamp);
     List<Alert> findAllByTimestampGreaterThanOrderByTimestampDesc(Long timestamp);
     boolean existsByTimestampGreaterThanAndNotifiedTrueAndDisasterEquals(Long timestamp, Disaster disaster);
+    int countAlertByDisasterEquals(Disaster disaster);
+    List<Alert> findAllByDisasterIdIn(List<Long> ids);
 }
